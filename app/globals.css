@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-sky-50 font-body text-ink-900 antialiased;
+  background-image: radial-gradient(circle at 10% 10%, rgba(253, 224, 71, 0.18), transparent 32rem),
+    radial-gradient(circle at 90% 4%, rgba(56, 189, 248, 0.16), transparent 28rem);
+  min-height: 100vh;
+}
+
+@layer components {
+  .card-nature {
+    @apply rounded-3xl border border-leaf-100 bg-white/90 p-5 shadow-card backdrop-blur;
+  }
+
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-leaf-300 focus-visible:ring-offset-2;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full bg-leaf-100 px-3 py-1 text-xs font-bold text-leaf-800;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

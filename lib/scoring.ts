@@ -1,0 +1,29 @@
+import { LEVEL_IDS } from "@/data/levels";
+import type { PersistedProgress, StarCount } from "@/types/game";
+
+export function normalizePercent(earned: number, possible: number): number {
+  if (possible <= 0) return 0;
+  return Math.round((earned / possible) * 100);
+}
+
+export function starsFromPercent(percent: number, thresholds: [number, number, number]): StarCount {
+  if (percent >= thresholds[2]) return 3;
+  if (percent >= thresholds[1]) return 2;
+  return 1;
+}
+
+export function totalStars(progress: PersistedProgress): number {
+  return LEVEL_IDS.reduce((sum, id) => sum + (progress.stars[id] ?? 0), 0);
+}
+
+export function completedCount(progress: PersistedProgress): number {
+  return progress.completedLevelIds.length;
+}
+
+export function overallPercent(progress: PersistedProgress): number {
+  return normalizePercent(completedCount(progress), LEVEL_IDS.length);
+}
+
+export function totalScore(progress: PersistedProgress): number {
+  return LEVEL_IDS.reduce((sum, id) => sum + (progress.bestScores[id] ?? 0), 0);
+}
