@@ -34,7 +34,7 @@ export default function HomePage() {
 
       <div className="relative z-10 mt-12 flex w-[min(82vw,280px)] flex-col items-center gap-4">
         <StartButton
-          href="/level/1"
+          href="/pembelajaran"
           onClick={unlockAudio}
           className="w-full"
         />
