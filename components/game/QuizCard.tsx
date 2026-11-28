@@ -182,7 +182,6 @@ export function QuizCard({
 
 type QuizRoundProps = {
   questions: QuizQuestion[];
-  onLifeLost: () => void;
   onFeedback: (message: string, tone: FeedbackTone) => void;
   onProgress: (correct: number, total: number) => void;
   onComplete: (outcome: ChallengeOutcome) => void;
@@ -190,13 +189,18 @@ type QuizRoundProps = {
 
 export function QuizRound({
   questions,
-  onLifeLost,
   onFeedback,
   onProgress,
   onComplete,
 }: QuizRoundProps) {
   const [index, setIndex] = useState(0);
   const [correct, setCorrect] = useState(0);
+  const [indicatorCorrect, setIndicatorCorrect] = useState({
+    concept: 0,
+    materials: 0,
+    energy: 0,
+    products: 0,
+  });
   const question = questions[index];
 
   if (!question) return null;
@@ -204,12 +208,17 @@ export function QuizRound({
   const handleAnswered = (isCorrect: boolean) => {
     const nextCorrect = correct + (isCorrect ? 1 : 0);
     setCorrect(nextCorrect);
+    if (isCorrect) {
+      setIndicatorCorrect((scores) => ({
+        ...scores,
+        [question.indicatorId]: scores[question.indicatorId] + 1,
+      }));
+    }
     onProgress(nextCorrect, questions.length);
     if (isCorrect) {
       onFeedback("Jawaban benar.", "success");
       return;
     }
-    onLifeLost();
     onFeedback("Jawaban belum tepat. Baca penjelasannya, ya.", "error");
   };
 
@@ -223,6 +232,7 @@ export function QuizRound({
       possible: questions.length * 10,
       correct,
       total: questions.length,
+      indicatorCorrect,
     });
   };
 

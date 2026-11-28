@@ -12,7 +12,6 @@ type LabelGameProps = {
   prompt: string;
   choices: LabelChoice[];
   slots: LabelSlot[];
-  onLifeLost: () => void;
   onFeedback: (message: string, tone: FeedbackTone) => void;
   onComplete: (outcome: ChallengeOutcome) => void;
 };
@@ -21,14 +20,13 @@ export function LabelGame({
   prompt,
   choices,
   slots,
-  onLifeLost,
   onFeedback,
   onComplete,
 }: LabelGameProps) {
   const options = choices.map((choice) => ({
     id: choice.id,
     label: choice.text,
-    assetKey: choice.assetKey ?? "badge",
+    assetKey: choice.assetKey,
   }));
 
   const targets = slots.map((slot) => ({
@@ -44,7 +42,6 @@ export function LabelGame({
       prompt={prompt}
       options={options}
       targets={targets}
-      onLifeLost={onLifeLost}
       onFeedback={onFeedback}
       onComplete={onComplete}
     />

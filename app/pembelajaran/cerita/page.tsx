@@ -6,9 +6,10 @@ import { AssetImage } from "@/components/ui/AssetImage";
 import { useAudio } from "@/hooks/useAudio";
 
 const QUESTION_LINES = [
-  "tumbuhan makan ...",
-  "jika tidak punya",
-  "mulut atau kaki?",
+  "bagaimana tumbuhan",
+  "membuat makanan",
+  "dengan bantuan",
+  "cahaya matahari?",
 ];
 
 function BubbleAccent({ className }: { className: string }) {
@@ -80,7 +81,7 @@ export default function CeritaPembelajaranPage() {
               <span>Bagaimana?</span>
               <span className="relative h-9 w-9 shrink-0">
                 <AssetImage
-                  assetKey="wiltedPlant"
+                  assetKey="sun"
                   alt=""
                   fill
                   className="h-full w-full"
@@ -124,8 +125,8 @@ export default function CeritaPembelajaranPage() {
               className="relative h-[225px] w-[190px] sm:h-[350px] sm:w-[295px]"
             >
               <AssetImage
-                assetKey="wiltedPlant"
-                alt="Tanaman layu di dalam pot"
+                assetKey="wiltedLeaf"
+                alt="Daun tumbuhan yang layu"
                 fill
                 className="h-full w-full"
                 imageClassName="object-contain"
@@ -138,8 +139,8 @@ export default function CeritaPembelajaranPage() {
               className="absolute right-0 top-0 h-[78px] w-[92px] sm:right-0 sm:top-1 sm:h-[100px] sm:w-[118px]"
             >
               <AssetImage
-                assetKey="rainCloud"
-                alt="Awan menurunkan hujan"
+                assetKey="rain"
+                alt="Hujan yang menyirami tumbuhan"
                 fill
                 className="h-full w-full"
                 imageClassName="object-contain"

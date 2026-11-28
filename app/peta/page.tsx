@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { AssetImage } from "@/components/ui/AssetImage";
 import { LinkButton } from "@/components/ui/Button";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { LEVELS } from "@/data/levels";
@@ -15,14 +14,19 @@ function StarRow({ count }: { count: number }) {
   return (
     <div className="flex items-center gap-1" aria-label={`${count} bintang`}>
       {[1, 2, 3].map((value) => (
-        <AssetImage
+        <svg
           key={value}
-          assetKey="bintang"
-          alt=""
-          width={24}
-          height={24}
-          className={cn(value > count && "opacity-25 grayscale")}
-        />
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+          className={cn("h-6 w-6", value <= count ? "fill-amber-400 text-amber-500" : "fill-slate-200 text-slate-300")}
+        >
+          <path
+            d="m12 2.8 2.8 5.7 6.3.9-4.55 4.45 1.08 6.28L12 17.17l-5.63 2.96 1.08-6.28L2.9 9.4l6.3-.9L12 2.8Z"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinejoin="round"
+          />
+        </svg>
       ))}
     </div>
   );
@@ -51,7 +55,7 @@ function LevelNode({
     >
       <div className="flex items-center justify-between gap-3">
         <span className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-current font-heading text-lg font-bold">
-          {level.id}
+          {stars > 0 ? "✓" : "→"}
         </span>
         <span className="text-xs font-bold uppercase tracking-wide">
           {unlocked ? (stars > 0 ? "Selesai" : "Terbuka") : "Terkunci"}
@@ -70,7 +74,7 @@ function LevelNode({
 
   if (!unlocked) {
     return (
-      <div aria-disabled="true" aria-label={`Level ${level.id} terkunci`}>
+      <div aria-disabled="true" aria-label="Materi terkunci">
         {inner}
       </div>
     );
@@ -78,9 +82,9 @@ function LevelNode({
 
   return (
     <Link
-      href={`/level/${level.id}`}
+      href="/kuis"
       onClick={onVisit}
-      aria-label={`Buka level ${level.id}: ${level.title}`}
+      aria-label="Buka kuis Proses Fotosintesis"
       className="focus-ring block rounded-3xl"
     >
       {inner}
@@ -104,13 +108,13 @@ export default function PetaPage() {
           </LinkButton>
         </header>
         <div className="card-nature mt-5 text-center">
-          <p className="chip mx-auto">Peta petualangan</p>
+          <p className="chip mx-auto">Kuis fotosintesis</p>
           <h1 className="mt-2 font-heading text-3xl font-bold text-leaf-800 sm:text-4xl">
-            Jalur tumbuhan
+            Proses Fotosintesis
           </h1>
           <ProgressBar
             className="mx-auto mt-4 max-w-md"
-            label={`${completedCount(progress)} dari ${LEVELS.length} level selesai`}
+            label={completedCount(progress) > 0 ? "Kuis selesai" : "Kuis belum selesai"}
             value={overallPercent(progress)}
           />
         </div>

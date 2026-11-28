@@ -6,11 +6,11 @@ import StartButton from "@/components/ui/StartButton";
 import { useAudio } from "@/hooks/useAudio";
 
 const INSTRUCTIONS = [
-  "Perhatikan video animasi fotosintesis sampai selesai. Kamu dapat menggunakan tombol Play/Pause dan Volume.",
-  "Klik tombol Mulai Belajar untuk memulai pembelajaran.",
-  "Klik setiap gambar atau ikon untuk mengetahui bahan dan proses fotosintesis.",
-  "Pilih jawaban yang menurutmu benar dan perhatikan umpan balik yang muncul.",
-  "Periksa skor akhirmu dan pilih apakah ingin mengulang video atau mengikuti evaluasi lanjutan.",
+  "Pelajari bahan dan tahapan proses fotosintesis sebelum mengerjakan kuis.",
+  "Kuis terdiri dari delapan soal tentang fotosintesis.",
+  "Pilih jawaban yang menurutmu paling tepat.",
+  "Jawaban keliru tidak mengurangi nyawa; baca penjelasan dan lanjutkan kuis.",
+  "Setelah delapan soal selesai, hasil kuis akan ditampilkan.",
 ];
 
 export default function PetunjukPage() {

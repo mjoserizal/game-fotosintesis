@@ -23,8 +23,8 @@ const fredoka = Fredoka({
 });
 
 export const metadata: Metadata = {
-  title: "Petualangan Fotosintesis",
-  description: "Game edukasi interaktif fotosintesis untuk siswa SMP/SMA.",
+  title: "Proses Fotosintesis",
+  description: "Game edukasi interaktif untuk mempelajari proses fotosintesis.",
 };
 
 export const viewport: Viewport = {

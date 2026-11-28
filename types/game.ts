@@ -1,8 +1,12 @@
 import type { AssetKey } from "@/lib/assets";
 
-export type LevelId = 1 | 2 | 3 | 4 | 5 | 6;
+export type LevelId = 1;
 
-export type StarCount = 1 | 2 | 3;
+export type StarCount = 0 | 1 | 2 | 3;
+
+export type QuizIndicatorId = "concept" | "materials" | "energy" | "products";
+
+export type IndicatorCorrect = Record<QuizIndicatorId, number>;
 
 export type Stage = "intro" | "materi" | "tantangan" | "kuis" | "hasil";
 
@@ -18,14 +22,14 @@ export type MaterialCard = {
   id: string;
   title: string;
   body: string;
-  assetKey: AssetKey;
+  assetKey?: AssetKey;
   fact?: string;
 };
 
 export type DragOption = {
   id: string;
   label: string;
-  assetKey: AssetKey;
+  assetKey?: AssetKey;
 };
 
 export type DragTarget = {
@@ -46,7 +50,7 @@ export type LabelSlot = {
   id: string;
   prompt: string;
   correctChoiceId: string;
-  assetKey: AssetKey;
+  assetKey?: AssetKey;
 };
 
 export type SequenceItem = {
@@ -54,20 +58,6 @@ export type SequenceItem = {
   text: string;
   detail: string;
   assetKey?: AssetKey;
-};
-
-export type RateFactors = {
-  light: number;
-  co2: number;
-  temperature: number;
-  water: number;
-};
-
-export type SimulatorMission = {
-  label: string;
-  targetRate: number;
-  suggested: RateFactors;
-  tolerance: number;
 };
 
 export type Challenge =
@@ -95,11 +85,6 @@ export type Challenge =
       items: SequenceItem[];
     }
   | {
-      kind: "simulator";
-      prompt: string;
-      mission: SimulatorMission;
-    }
-  | {
       kind: "mixed";
       prompt: string;
     };
@@ -114,6 +99,7 @@ export type QuizOption = {
 export type QuizQuestion = {
   id: string;
   levelId: LevelId;
+  indicatorId: QuizIndicatorId;
   type: QuestionType;
   prompt: string;
   options: QuizOption[];
@@ -126,7 +112,6 @@ export type Badge = {
   id: string;
   name: string;
   description: string;
-  assetKey: AssetKey;
 };
 
 export type Level = {
@@ -143,7 +128,6 @@ export type Level = {
   hints: string[];
   badge: Badge;
   starThresholds: [number, number, number];
-  timeLimitSeconds?: number;
 };
 
 export type GlossaryTerm = {
@@ -167,6 +151,8 @@ export type PersistedProgress = {
   completedLevelIds: LevelId[];
   stars: Partial<Record<LevelId, number>>;
   bestScores: Partial<Record<LevelId, number>>;
+  bestIndicatorCorrect: Partial<Record<LevelId, IndicatorCorrect>>;
+  latestResults: Partial<Record<LevelId, QuizAttemptResult>>;
   badges: string[];
   unlockedGlossary: string[];
   lastLevelId: LevelId;
@@ -180,9 +166,16 @@ export type LevelResult = {
   stars: StarCount;
   correct: number;
   total: number;
-  lives: number;
+  indicatorCorrect: IndicatorCorrect;
   elapsedSeconds: number;
   success: boolean;
+};
+
+export type QuizAttemptResult = {
+  score: number;
+  correct: number;
+  total: number;
+  indicatorCorrect: IndicatorCorrect;
 };
 
 export type FeedbackTone = "success" | "error" | "info";
@@ -192,4 +185,5 @@ export type ChallengeOutcome = {
   possible: number;
   correct: number;
   total: number;
+  indicatorCorrect?: IndicatorCorrect;
 };

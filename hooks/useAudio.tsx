@@ -9,7 +9,7 @@ import {
   useRef,
   type ReactNode,
 } from "react";
-import { ASSETS, type SfxKey } from "@/lib/assets";
+import { ASSETS, SFX_ASSETS, type SfxKey } from "@/lib/assets";
 import { useGameStore } from "./useGameStore";
 
 type AudioValue = {
@@ -81,8 +81,10 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   }, [progress.settings]);
 
   const playSfx = useCallback((key: SfxKey) => {
+    const source = SFX_ASSETS[key];
     if (
       typeof window === "undefined" ||
+      !source ||
       settingsRef.current.muted ||
       settingsRef.current.sfxVolume <= 0
     ) {
@@ -90,7 +92,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     }
     let audio = sfxRef.current[key];
     if (!audio) {
-      audio = new Audio(ASSETS[key]);
+      audio = new Audio(source);
       sfxRef.current[key] = audio;
     }
     audio.volume = settingsRef.current.sfxVolume;

@@ -92,10 +92,10 @@ export function AssetImage({
         sizes={fill ? sizes : undefined}
         priority={priority}
         unoptimized
-        className={cn("object-contain", imageClassName)}
+        className={cn("h-full w-full object-contain", imageClassName)}
         onError={() => setFailed(true)}
       />
-      {/* TODO: hapus fallback ini setelah semua asset user tersedia di /public/assets. */}
+      {/* TODO: hapus fallback setelah semua aset produksi tersedia. */}
     </div>
   );
 }

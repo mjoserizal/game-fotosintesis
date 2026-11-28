@@ -38,13 +38,15 @@ export function MaterialCards({
               aria-expanded={open}
               className="focus-ring card-nature flex h-full flex-col items-start gap-3 text-left transition-shadow hover:shadow-soft"
             >
-              <AssetImage
-                assetKey={card.assetKey}
-                alt={card.title}
-                width={64}
-                height={64}
-                className="rounded-2xl"
-              />
+              {card.assetKey ? (
+                <AssetImage
+                  assetKey={card.assetKey}
+                  alt={card.title}
+                  width={64}
+                  height={64}
+                  className="rounded-2xl"
+                />
+              ) : null}
               <span className="font-heading text-lg font-bold text-leaf-800">{card.title}</span>
               <span className="text-sm leading-relaxed text-ink-700">{card.body}</span>
               <AnimatePresence initial={false}>

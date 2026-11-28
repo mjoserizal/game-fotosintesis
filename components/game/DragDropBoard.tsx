@@ -28,7 +28,6 @@ type DragDropBoardProps = {
   prompt: string;
   options: DragOption[];
   targets: DragTarget[];
-  onLifeLost: () => void;
   onFeedback: (message: string, tone: FeedbackTone) => void;
   onComplete: (outcome: ChallengeOutcome) => void;
 };
@@ -70,7 +69,9 @@ function DraggableOption({
         isDragging && "z-20 opacity-70",
       )}
     >
-      <AssetImage assetKey={option.assetKey} alt={option.label} width={44} height={44} />
+      {option.assetKey ? (
+        <AssetImage assetKey={option.assetKey} alt={option.label} width={44} height={44} />
+      ) : null}
       <span>{option.label}</span>
     </button>
   );
@@ -126,7 +127,6 @@ export function DragDropBoard({
   prompt,
   options,
   targets,
-  onLifeLost,
   onFeedback,
   onComplete,
 }: DragDropBoardProps) {
@@ -178,7 +178,6 @@ export function DragDropBoard({
       return;
     }
     setSelectedId(null);
-    onLifeLost();
     playSfx("sfxSalah");
     onFeedback("Belum tepat. Pikirkan fungsi jalur itu.", "error");
   };

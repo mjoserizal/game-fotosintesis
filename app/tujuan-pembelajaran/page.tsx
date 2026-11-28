@@ -8,13 +8,23 @@ import { useAudio } from "@/hooks/useAudio";
 const OBJECTIVES = [
   {
     assetKey: "co2",
-    alt: "Ilustrasi bahan dan proses fotosintesis",
-    text: "1. Menganalisis proses fotosintesis dengan tepat.",
+    alt: "Ilustrasi karbon dioksida",
+    text: "1. Menyebutkan bahan yang diperlukan dalam fotosintesis.",
   },
   {
-    assetKey: "bumi",
-    alt: "Ilustrasi dampak fotosintesis bagi bumi",
-    text: "2. Menjelaskan dampak fotosintesis bagi bumi.",
+    assetKey: "water",
+    alt: "Ilustrasi air",
+    text: "2. Menjelaskan peran air dan karbon dioksida.",
+  },
+  {
+    assetKey: "chlorophyll",
+    alt: "Ilustrasi klorofil",
+    text: "3. Mengenali peran klorofil dan cahaya matahari.",
+  },
+  {
+    assetKey: "sun",
+    alt: "Ilustrasi cahaya matahari",
+    text: "4. Menjelaskan hasil utama proses fotosintesis.",
   },
 ] as const;
 

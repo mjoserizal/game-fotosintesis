@@ -14,13 +14,16 @@ import { getTermsForLevel } from "@/data/glossary";
 import { getNextLevelId, LEVELS, LEVEL_IDS } from "@/data/levels";
 import type {
   GameSettings,
+  IndicatorCorrect,
   LevelId,
   LevelResult,
   PersistedProgress,
+  QuizAttemptResult,
+  QuizIndicatorId,
 } from "@/types/game";
 import { useLocalStorage } from "./useLocalStorage";
 
-const STORAGE_KEY = "petualangan-fotosintesis:v1";
+const STORAGE_KEY = "proses-fotosintesis:v1";
 
 function createDefaultProgress(): PersistedProgress {
   return {
@@ -29,6 +32,8 @@ function createDefaultProgress(): PersistedProgress {
     completedLevelIds: [],
     stars: {},
     bestScores: {},
+    bestIndicatorCorrect: {},
+    latestResults: {},
     badges: [],
     unlockedGlossary: [],
     lastLevelId: 1,
@@ -49,6 +54,74 @@ function volumeFrom(value: unknown, fallback: number): number {
   return typeof value === "number" && Number.isFinite(value)
     ? Math.min(1, Math.max(0, value))
     : fallback;
+}
+
+function readIndicatorCorrect(value: unknown): IndicatorCorrect | null {
+  if (typeof value !== "object" || value === null) return null;
+  const raw = value as Record<QuizIndicatorId, unknown>;
+  const ids: QuizIndicatorId[] = ["concept", "materials", "energy", "products"];
+  const scores: IndicatorCorrect = {
+    concept: 0,
+    materials: 0,
+    energy: 0,
+    products: 0,
+  };
+  for (const id of ids) {
+    const score = raw[id];
+    if (typeof score !== "number" || !Number.isInteger(score) || score < 0 || score > 2) {
+      return null;
+    }
+    scores[id] = score;
+  }
+  return scores;
+}
+
+function readBestIndicatorCorrect(
+  value: unknown,
+): Partial<Record<LevelId, IndicatorCorrect>> {
+  if (typeof value !== "object" || value === null) return {};
+  const raw = value as Record<string, unknown>;
+  const result: Partial<Record<LevelId, IndicatorCorrect>> = {};
+  for (const id of LEVEL_IDS) {
+    const scores = readIndicatorCorrect(raw[String(id)]);
+    if (scores) result[id] = scores;
+  }
+  return result;
+}
+
+function readLatestResults(
+  value: unknown,
+): Partial<Record<LevelId, QuizAttemptResult>> {
+  if (typeof value !== "object" || value === null) return {};
+  const raw = value as Record<string, unknown>;
+  const result: Partial<Record<LevelId, QuizAttemptResult>> = {};
+  for (const id of LEVEL_IDS) {
+    const attempt = raw[String(id)];
+    if (typeof attempt !== "object" || attempt === null) continue;
+    const candidate = attempt as Record<string, unknown>;
+    const indicatorCorrect = readIndicatorCorrect(candidate.indicatorCorrect);
+    if (
+      typeof candidate.score === "number" &&
+      Number.isFinite(candidate.score) &&
+      candidate.score >= 0 &&
+      typeof candidate.correct === "number" &&
+      Number.isInteger(candidate.correct) &&
+      typeof candidate.total === "number" &&
+      Number.isInteger(candidate.total) &&
+      candidate.total > 0 &&
+      candidate.correct >= 0 &&
+      candidate.correct <= candidate.total &&
+      indicatorCorrect
+    ) {
+      result[id] = {
+        score: candidate.score,
+        correct: candidate.correct,
+        total: candidate.total,
+        indicatorCorrect,
+      };
+    }
+  }
+  return result;
 }
 
 function reviveProgress(value: unknown): PersistedProgress | null {
@@ -75,6 +148,8 @@ function reviveProgress(value: unknown): PersistedProgress | null {
       typeof raw.bestScores === "object" && raw.bestScores !== null
         ? raw.bestScores
         : {},
+    bestIndicatorCorrect: readBestIndicatorCorrect(raw.bestIndicatorCorrect),
+    latestResults: readLatestResults(raw.latestResults),
     badges: Array.isArray(raw.badges)
       ? raw.badges.filter((item): item is string => typeof item === "string")
       : [],
@@ -94,7 +169,7 @@ function reviveProgress(value: unknown): PersistedProgress | null {
 
 type ProgressAction =
   | { type: "hydrate"; payload: PersistedProgress }
-  | { type: "complete"; result: LevelResult }
+  | { type: "record"; result: LevelResult }
   | { type: "reset" }
   | { type: "settings"; payload: Partial<GameSettings> };
 
@@ -109,10 +184,37 @@ function progressReducer(
       return createDefaultProgress();
     case "settings":
       return { ...state, settings: { ...state.settings, ...action.payload } };
-    case "complete": {
-      if (!action.result.success) return state;
+    case "record": {
       const level = LEVELS.find((item) => item.id === action.result.levelId);
       if (!level) return state;
+      const bestScores = {
+        ...state.bestScores,
+        [level.id]: Math.max(
+          state.bestScores[level.id] ?? 0,
+          action.result.score,
+        ),
+      };
+      const currentIndicatorScores = state.bestIndicatorCorrect ?? {};
+      const bestIndicatorCorrect =
+        action.result.score >= (state.bestScores[level.id] ?? -1)
+          ? {
+              ...currentIndicatorScores,
+              [level.id]: action.result.indicatorCorrect,
+            }
+          : currentIndicatorScores;
+      const latestResults = {
+        ...state.latestResults,
+        [level.id]: {
+            score: action.result.score,
+            correct: action.result.correct,
+            total: action.result.total,
+            indicatorCorrect: action.result.indicatorCorrect,
+        },
+      };
+      if (!action.result.success) {
+        return { ...state, bestScores, bestIndicatorCorrect, latestResults };
+      }
+
       const nextId = getNextLevelId(level.id);
       const termIds = getTermsForLevel(level.id).map((term) => term.id);
       return {
@@ -127,13 +229,9 @@ function progressReducer(
           ...state.stars,
           [level.id]: Math.max(state.stars[level.id] ?? 0, action.result.stars),
         },
-        bestScores: {
-          ...state.bestScores,
-          [level.id]: Math.max(
-            state.bestScores[level.id] ?? 0,
-            action.result.score,
-          ),
-        },
+        bestScores,
+        bestIndicatorCorrect,
+        latestResults,
         badges: Array.from(new Set([...state.badges, level.badge.id])),
         unlockedGlossary: Array.from(
           new Set([...state.unlockedGlossary, ...termIds]),
@@ -149,7 +247,7 @@ function progressReducer(
 type GameStoreValue = {
   progress: PersistedProgress;
   hydrated: boolean;
-  completeLevel: (result: LevelResult) => void;
+  recordLevelResult: (result: LevelResult) => void;
   resetProgress: () => void;
   updateSettings: (settings: Partial<GameSettings>) => void;
   isLevelUnlocked: (id: LevelId) => boolean;
@@ -189,8 +287,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setStored(progress);
   }, [progress, hydrated, setStored]);
 
-  const completeLevel = useCallback((result: LevelResult) => {
-    dispatch({ type: "complete", result });
+  const recordLevelResult = useCallback((result: LevelResult) => {
+    dispatch({ type: "record", result });
   }, []);
 
   const resetProgress = useCallback(() => {
@@ -205,7 +303,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     () => ({
       progress,
       hydrated,
-      completeLevel,
+      recordLevelResult,
       resetProgress,
       updateSettings,
       isLevelUnlocked: (id) => progress.unlockedLevelIds.includes(id),
@@ -215,7 +313,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     [
       progress,
       hydrated,
-      completeLevel,
+      recordLevelResult,
       resetProgress,
       updateSettings,
     ],

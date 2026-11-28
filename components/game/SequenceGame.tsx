@@ -14,7 +14,6 @@ import type {
 type SequenceGameProps = {
   prompt: string;
   items: SequenceItem[];
-  onLifeLost: () => void;
   onFeedback: (message: string, tone: FeedbackTone) => void;
   onComplete: (outcome: ChallengeOutcome) => void;
 };
@@ -22,7 +21,6 @@ type SequenceGameProps = {
 export function SequenceGame({
   prompt,
   items,
-  onLifeLost,
   onFeedback,
   onComplete,
 }: SequenceGameProps) {
@@ -53,7 +51,7 @@ export function SequenceGame({
     if (correctCount === items.length) {
       completedRef.current = true;
       playSfx("sfxBenar");
-      onFeedback("Urutan tepat! Siklus Calvin siap berjalan.", "success");
+      onFeedback("Urutan tepat!", "success");
       onComplete({
         earned: items.length * 20,
         possible: items.length * 20,
@@ -62,7 +60,6 @@ export function SequenceGame({
       });
       return;
     }
-    onLifeLost();
     playSfx("sfxSalah");
     onFeedback(`${correctCount} dari ${items.length} posisi sudah tepat. Coba lagi.`, "error");
   };

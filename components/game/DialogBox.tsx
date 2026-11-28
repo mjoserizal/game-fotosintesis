@@ -54,7 +54,7 @@ export function DialogBox({
 
   return (
     <motion.div
-      className="card-nature mx-auto max-w-3xl"
+      className="card-nature mx-auto w-full max-w-none"
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
     >
@@ -62,8 +62,8 @@ export function DialogBox({
         <AssetImage
           assetKey={line.assetKey}
           alt={line.speaker}
-          width={88}
-          height={88}
+          width={72}
+          height={90}
           className="shrink-0 rounded-2xl"
         />
         <div className="min-w-0 flex-1">
